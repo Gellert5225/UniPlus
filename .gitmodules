@@ -1,0 +1,3 @@
+[submodule "iOS Client"]
+	path = iOS Client
+	url = https://Gellert@bitbucket.org/Gellert/uniplus.git
