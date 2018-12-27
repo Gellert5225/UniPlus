@@ -8,7 +8,7 @@ language_tabs: # must be one of https://git.io/vQNgJ
 
 toc_footers:
   - <a href='https://github.com/Gellert5225/UniPlus.git'>GitHub Repository</a>
-  - <a href='#'>Database Dashboard</a>
+  - <a href='localhost:4040'>Database Dashboard</a>
 
 includes:
   - datamodel
@@ -35,7 +35,7 @@ We use [Parse](http://parseplatform.org) as our backend service, and you can fin
 
 ## Usage
 
-Our server is deployed on Heroku, to run the server locally, clone the GitHub repo, and go to the folder "server". First, you need to install all node dependencies, simply run
+Our server is deployed on Heroku, to run the server locally, clone the GitHub repo, and go to the folder "Server/Dev" or "Server/Prod". First, you need to install all node dependencies, simply run
 
 `npm install` 
 
@@ -47,7 +47,7 @@ Donezo! Go visit the webpage at localhost:1337
 
 ## Dashboard
 
-We also provide a visual tool for viewing our database. To run the dashboard, go to `dashboard` directory and run
+We also provide a visual tool for viewing our database. To run the dashboard, go to `Dashboard` directory and run
 
 `npm start`
 
