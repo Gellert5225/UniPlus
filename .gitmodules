@@ -1,3 +1,7 @@
 [submodule "iOS Client"]
 	path = iOS Client
-	url = https://Gellert@bitbucket.org/Gellert/uniplus.git
+	url = https://github.com/Gellert5225/UniPlus-iOS.git
+[submodule "Server Dev"]
+	path = Server/Dev
+	url = https://github.com/Gellert5225/UniPlus-Server-Dev.git
+
