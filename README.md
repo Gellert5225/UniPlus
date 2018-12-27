@@ -35,7 +35,7 @@ and then you can go to localhost:4040 to view or change data in a more beautiful
 
 ## Documentation
 
-The documentation is inside the `Docs/source/index.html.md` file. While the server is running, go to localhost:4040/docs to view the documentation.
+The documentation is inside the `Docs/source/index.html.md` file. While the server is running, go to localhost:1337/docs to view the documentation.
 
 You can refer to [this](https://github.com/lord/slate/wiki/Markdown-Syntax) article about Markdown syntax.
 
