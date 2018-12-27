@@ -15,7 +15,7 @@ We use [Parse](http://parseplatform.org) as our backend service, and you can fin
 
 ## Usage
 
-Our server is deployed on Heroku, to run the server locally, clone the GitHub repo, and go to the folder "server". First, you need to install all node dependencies, simply run
+Our server is deployed on Heroku, to run the server locally, clone the GitHub repo, and go to the folder "Server/Dev". First, you need to install all node dependencies, simply run
 
 `npm install` 
 
