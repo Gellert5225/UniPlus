@@ -1,0 +1,767 @@
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Reference</title>
+    <link href="images/favicon.png" rel="icon" type="image/png" />
+    <style>
+      .highlight table td { padding: 5px; }
+.highlight table pre { margin: 0; }
+.highlight .gh {
+  color: #999999;
+}
+.highlight .sr {
+  color: #f6aa11;
+}
+.highlight .go {
+  color: #888888;
+}
+.highlight .gp {
+  color: #555555;
+}
+.highlight .gs {
+}
+.highlight .gu {
+  color: #aaaaaa;
+}
+.highlight .nb {
+  color: #f6aa11;
+}
+.highlight .cm {
+  color: #75715e;
+}
+.highlight .cp {
+  color: #75715e;
+}
+.highlight .c1 {
+  color: #75715e;
+}
+.highlight .cs {
+  color: #75715e;
+}
+.highlight .c, .highlight .cd {
+  color: #75715e;
+}
+.highlight .err {
+  color: #960050;
+}
+.highlight .gr {
+  color: #960050;
+}
+.highlight .gt {
+  color: #960050;
+}
+.highlight .gd {
+  color: #49483e;
+}
+.highlight .gi {
+  color: #49483e;
+}
+.highlight .ge {
+  color: #49483e;
+}
+.highlight .kc {
+  color: #66d9ef;
+}
+.highlight .kd {
+  color: #66d9ef;
+}
+.highlight .kr {
+  color: #66d9ef;
+}
+.highlight .no {
+  color: #66d9ef;
+}
+.highlight .kt {
+  color: #66d9ef;
+}
+.highlight .mf {
+  color: #ae81ff;
+}
+.highlight .mh {
+  color: #ae81ff;
+}
+.highlight .il {
+  color: #ae81ff;
+}
+.highlight .mi {
+  color: #ae81ff;
+}
+.highlight .mo {
+  color: #ae81ff;
+}
+.highlight .m, .highlight .mb, .highlight .mx {
+  color: #ae81ff;
+}
+.highlight .sc {
+  color: #ae81ff;
+}
+.highlight .se {
+  color: #ae81ff;
+}
+.highlight .ss {
+  color: #ae81ff;
+}
+.highlight .sd {
+  color: #e6db74;
+}
+.highlight .s2 {
+  color: #e6db74;
+}
+.highlight .sb {
+  color: #e6db74;
+}
+.highlight .sh {
+  color: #e6db74;
+}
+.highlight .si {
+  color: #e6db74;
+}
+.highlight .sx {
+  color: #e6db74;
+}
+.highlight .s1 {
+  color: #e6db74;
+}
+.highlight .s {
+  color: #e6db74;
+}
+.highlight .na {
+  color: #a6e22e;
+}
+.highlight .nc {
+  color: #a6e22e;
+}
+.highlight .nd {
+  color: #a6e22e;
+}
+.highlight .ne {
+  color: #a6e22e;
+}
+.highlight .nf {
+  color: #a6e22e;
+}
+.highlight .vc {
+  color: #ffffff;
+}
+.highlight .nn {
+  color: #ffffff;
+}
+.highlight .nl {
+  color: #ffffff;
+}
+.highlight .ni {
+  color: #ffffff;
+}
+.highlight .bp {
+  color: #ffffff;
+}
+.highlight .vg {
+  color: #ffffff;
+}
+.highlight .vi {
+  color: #ffffff;
+}
+.highlight .nv {
+  color: #ffffff;
+}
+.highlight .w {
+  color: #ffffff;
+}
+.highlight {
+  color: #ffffff;
+}
+.highlight .n, .highlight .py, .highlight .nx {
+  color: #ffffff;
+}
+.highlight .ow {
+  color: #f92672;
+}
+.highlight .nt {
+  color: #f92672;
+}
+.highlight .k, .highlight .kv {
+  color: #f92672;
+}
+.highlight .kn {
+  color: #f92672;
+}
+.highlight .kp {
+  color: #f92672;
+}
+.highlight .o {
+  color: #f92672;
+}
+    </style>
+    <link href="stylesheets/screen.css" rel="stylesheet" media="screen" />
+    <link href="stylesheets/print.css" rel="stylesheet" media="print" />
+      <script src="javascripts/all.js"></script>
+  </head>
+
+  <body class="index" data-languages="[&quot;swift&quot;,&quot;java&quot;,&quot;javascript&quot;]">
+    <a href="#" id="nav-button">
+      <span>
+        NAV
+        <img src="images/navbar.png" alt="Navbar" />
+      </span>
+    </a>
+    <div class="toc-wrapper">
+      <img src="images/logo.png" class="logo" alt="Logo" />
+        <div class="lang-selector">
+              <a href="#" data-language-name="swift">Swift</a>
+              <a href="#" data-language-name="java">Java</a>
+              <a href="#" data-language-name="javascript">JavaScript</a>
+        </div>
+        <div class="search">
+          <input type="text" class="search" id="input-search" placeholder="Search">
+        </div>
+        <ul class="search-results"></ul>
+      <div id="toc" class="toc-list-h1">
+          <li>
+            <a href="#introduction" class="toc-h1 toc-link" data-title="Introduction">Introduction</a>
+          </li>
+          <li>
+            <a href="#installation" class="toc-h1 toc-link" data-title="Installation">Installation</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#prerequisite" class="toc-h2 toc-link" data-title="Installation">Prerequisite</a>
+                  </li>
+                  <li>
+                    <a href="#usage" class="toc-h2 toc-link" data-title="Installation">Usage</a>
+                  </li>
+                  <li>
+                    <a href="#dashboard" class="toc-h2 toc-link" data-title="Installation">Dashboard</a>
+                  </li>
+                  <li>
+                    <a href="#documentation" class="toc-h2 toc-link" data-title="Installation">Documentation</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#development" class="toc-h1 toc-link" data-title="Development">Development</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#web" class="toc-h2 toc-link" data-title="Development">Web</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#style-guide" class="toc-h1 toc-link" data-title="Style Guide">Style Guide</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#indentation-and-spacing" class="toc-h2 toc-link" data-title="Style Guide">Indentation and spacing</a>
+                  </li>
+                  <li>
+                    <a href="#naming-and-identifiers" class="toc-h2 toc-link" data-title="Style Guide">Naming and identifiers</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#data-model" class="toc-h1 toc-link" data-title="Data Model">Data Model</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#person" class="toc-h2 toc-link" data-title="Data Model">Person</a>
+                  </li>
+                  <li>
+                    <a href="#student" class="toc-h2 toc-link" data-title="Data Model">Student</a>
+                  </li>
+                  <li>
+                    <a href="#mentor" class="toc-h2 toc-link" data-title="Data Model">Mentor</a>
+                  </li>
+                  <li>
+                    <a href="#parent" class="toc-h2 toc-link" data-title="Data Model">Parent</a>
+                  </li>
+                  <li>
+                    <a href="#project" class="toc-h2 toc-link" data-title="Data Model">Project</a>
+                  </li>
+                  <li>
+                    <a href="#debrief" class="toc-h2 toc-link" data-title="Data Model">Debrief</a>
+                  </li>
+                  <li>
+                    <a href="#others" class="toc-h2 toc-link" data-title="Data Model">Others</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#cloud-codes" class="toc-h1 toc-link" data-title="Cloud Codes">Cloud Codes</a>
+          </li>
+          <li>
+            <a href="#restful-routes" class="toc-h1 toc-link" data-title="RESTful Routes">RESTful Routes</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#login" class="toc-h2 toc-link" data-title="RESTful Routes">Login</a>
+                  </li>
+                  <li>
+                    <a href="#register" class="toc-h2 toc-link" data-title="RESTful Routes">Register</a>
+                  </li>
+                  <li>
+                    <a href="#logout" class="toc-h2 toc-link" data-title="RESTful Routes">Logout</a>
+                  </li>
+              </ul>
+          </li>
+      </div>
+        <ul class="toc-footer">
+            <li><a href='https://github.com/Gellert5225/UniPlus.git'>GitHub Repository</a></li>
+            <li><a href='localhost:4040'>Database Dashboard</a></li>
+        </ul>
+    </div>
+    <div class="page-wrapper">
+      <div class="dark-box"></div>
+      <div class="content">
+        <h1 id='introduction'>Introduction</h1>
+<p>Welcome to the UniPlus documentation! You can use this document as a refrence to data models, REST routes and cloud functions. </p>
+
+<p>We have language bindings in Swift, Objective-C, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.</p>
+<h1 id='installation'>Installation</h1><h2 id='prerequisite'>Prerequisite</h2>
+<p>You need to have Node.js installed on your machine. </p>
+
+<p>We use <a href="http://parseplatform.org">Parse</a> as our backend service, and you can find their documentations <a href="http://docs.parseplatform.org">here</a>.</p>
+<h2 id='usage'>Usage</h2>
+<p>Our server is deployed on Heroku, to run the server locally, clone the GitHub repo, and go to the folder &quot;Server/Dev&quot; or &quot;Server/Prod&quot;. First, you need to install all node dependencies, simply run</p>
+
+<p><code>npm install</code> </p>
+
+<p>and then you need to start the server using </p>
+
+<p><code>npm start</code> </p>
+
+<p>Donezo! Go visit the webpage at localhost:1337</p>
+<h2 id='dashboard'>Dashboard</h2>
+<p>We also provide a visual tool for viewing our database. To run the dashboard, go to <code>Dashboard</code> directory and run</p>
+
+<p><code>npm start</code></p>
+
+<p>and then you can go to localhost:4040 to view or change data in a more beautiful way.</p>
+<h2 id='documentation'>Documentation</h2>
+<p>The documentation is inside the <code>Docs/source/index.html.md</code> file. You can refer to <a href="https://github.com/lord/slate/wiki/Markdown-Syntax">this</a> article about Markdown syntax.</p>
+<h1 id='development'>Development</h1><h2 id='web'>Web</h2><h3 id='front-end'>Front-end</h3>
+<p>We use EJS as our view engine, you can find more about EJS <a href="http://ejs.co">here</a>. </p>
+
+<p>All ejs files should be placed insede <code>views</code> folder, for javascript, css and images please put them in <code>public/asset</code> folder.</p>
+<h3 id='back-end'>Back-end</h3>
+<p>We use Node.js and MongoDB as our server + database service. </p>
+
+<p>All REST routes js files should be placed inside <code>routes</code> folder.</p>
+<h1 id='style-guide'>Style Guide</h1>
+<aside class="notice">Please read this section carefully, it is very important for all team members to have a consistent coding style.</aside>
+<h2 id='indentation-and-spacing'>Indentation and spacing</h2>
+<blockquote>
+<p>Indentation and spacing</p>
+</blockquote>
+<pre class="highlight swift tab-swift"><code><span class="c1">// correct</span>
+<span class="k">let</span> <span class="nv">a</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="k">let</span> <span class="nv">b</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="k">let</span> <span class="nv">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// do sth.</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// do sth else.</span>
+<span class="p">}</span>
+
+<span class="c1">// wrong</span>
+<span class="k">let</span> <span class="nv">d</span><span class="o">=</span><span class="mi">3</span>
+<span class="k">if</span><span class="p">(</span><span class="n">d</span><span class="o">&gt;</span><span class="mi">3</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="c1">//do stuff</span>
+
+<span class="p">}</span>
+<span class="k">else</span> 
+<span class="p">{</span>
+
+<span class="p">}</span>
+
+</code></pre>
+<p>Both swift and Java should use one tab(4 spaces) as indentation, and 2 spaces for JavaScript. </p>
+
+<p>You should leave one space on the left and right side of operators. And leave one space after keywords.</p>
+
+<p>The opening curly bracket should be in-line.</p>
+<h2 id='naming-and-identifiers'>Naming and identifiers</h2>
+<blockquote>
+<p>Naming and identifiers</p>
+</blockquote>
+<pre class="highlight swift tab-swift"><code><span class="c1">// correct</span>
+<span class="k">let</span> <span class="nv">numberOfStudents</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="k">let</span> <span class="nv">availableSpots</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="kd">func</span> <span class="nf">getExtraStudent</span><span class="p">()</span> <span class="p">{</span>
+
+<span class="p">}</span>
+
+<span class="c1">// wrong</span>
+<span class="k">let</span> <span class="nv">nos</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="k">let</span> <span class="nv">s</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="kd">func</span> <span class="nf">my_func1</span><span class="p">()</span> <span class="p">{</span>
+
+<span class="p">}</span>
+
+</code></pre>
+<p>You should always use camel case for variables and functions, and identifiers should have meaningful and descriptive names. All variables and function names should begin with lower case, all class, struct, and enum should begin with capital letter.</p>
+
+<p>Always initialize your variables! And only declare them right before you gonna use them.</p>
+
+<p>Note, Swift has optional types which allow NULL values, so it is okay to use optional instead of initializing.</p>
+<h1 id='data-model'>Data Model</h1>
+<p>This section contains the data model for Student, Mentor, Parent, Project, Debrief.</p>
+<h2 id='person'>Person</h2>
+<p>The base class for Student, Parent and Mentor. </p>
+
+<table><thead>
+<tr>
+<th>Identifier</th>
+<th>Data Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>username</td>
+<td>String</td>
+<td>The username for the specific user</td>
+</tr>
+<tr>
+<td>name</td>
+<td>String</td>
+<td>The real name for the specific user</td>
+</tr>
+<tr>
+<td>id</td>
+<td>String</td>
+<td>The object id stored in database</td>
+</tr>
+<tr>
+<td>userGroup</td>
+<td>String</td>
+<td>Either a &quot;mentor&quot; or a &quot;parent&quot;</td>
+</tr>
+<tr>
+<td>profilePhoto</td>
+<td>Parse File</td>
+<td>The profile picture for the specific user</td>
+</tr>
+<tr>
+<td>parseObject</td>
+<td>Parse Object</td>
+<td>The Parse Object associated with the specific user</td>
+</tr>
+</tbody></table>
+<h2 id='student'>Student</h2><pre class="highlight swift tab-swift"><code><span class="c1">// to initialized a student object</span>
+<span class="k">let</span> <span class="nv">studentObject</span><span class="p">:</span> <span class="kt">PFObject</span> <span class="o">=</span> <span class="o">...</span> <span class="c1">// retrieve student from database</span>
+<span class="k">let</span> <span class="nv">student</span> <span class="o">=</span> <span class="kt">Student</span><span class="p">(</span><span class="nv">from</span><span class="p">:</span> <span class="n">studentObject</span><span class="p">)</span>
+
+<span class="c1">// to retrieve total class of a program</span>
+<span class="kd">func</span> <span class="nf">getTotalClass</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Int</span> <span class="p">{</span>
+<span class="k">return</span> <span class="n">program</span> <span class="o">==</span> <span class="s">"STEM Club"</span> <span class="p">?</span> <span class="mi">52</span> <span class="p">:</span> <span class="mi">12</span>
+<span class="p">}</span>
+</code></pre><pre class="highlight java tab-java"><code><span class="c1">// future Java code</span>
+</code></pre>
+<p>The derived class from Person, which contains all information about a student.</p>
+
+<table><thead>
+<tr>
+<th>Identifier</th>
+<th>Data Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>program</td>
+<td>String</td>
+<td>The program in which the student participates</td>
+</tr>
+<tr>
+<td>level</td>
+<td>String</td>
+<td>The level of the program at which the student currently is</td>
+</tr>
+<tr>
+<td>gender</td>
+<td>String</td>
+<td>The gender of the student</td>
+</tr>
+<tr>
+<td>projectsFinished</td>
+<td>Integer</td>
+<td>Number of projects completed by the specific student</td>
+</tr>
+<tr>
+<td>classesFinished</td>
+<td>Integer</td>
+<td>Number of classes completed by the specific student (within one program)</td>
+</tr>
+<tr>
+<td>lastAttendance</td>
+<td>Date</td>
+<td>The last date which the student attends</td>
+</tr>
+<tr>
+<td>projects</td>
+<td>Array&lt;<a href="#project">Project</a>&gt;</td>
+<td>An array of projects completed by the specific student</td>
+</tr>
+<tr>
+<td>currentProject</td>
+<td><a href="#project">Project</a></td>
+<td>The project that the student is working on</td>
+</tr>
+<tr>
+<td>day</td>
+<td><a href="#day">Day</a></td>
+<td>The come-in date and time for the specific student</td>
+</tr>
+</tbody></table>
+<h2 id='mentor'>Mentor</h2>
+<p>The derived class from Person, which contains all information about a mentor.</p>
+
+<table><thead>
+<tr>
+<th>Identifier</th>
+<th>Data Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>mentorInfo</td>
+<td>String</td>
+<td>The information about the specific mentor</td>
+</tr>
+<tr>
+<td>availableDates</td>
+<td>Array&lt;<a href="#day">Day</a>&gt;</td>
+<td>The available date and time for the specific mentor</td>
+</tr>
+</tbody></table>
+<h2 id='parent'>Parent</h2>
+<p>The derived class from Person, which contains all information about a parent.</p>
+
+<table><thead>
+<tr>
+<th>Identifier</th>
+<th>Data Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>phone</td>
+<td>String</td>
+<td>The phone number of the specific parent</td>
+</tr>
+<tr>
+<td>email</td>
+<td>String</td>
+<td>The email of the specific parent</td>
+</tr>
+<tr>
+<td>students</td>
+<td>Array&lt;<a href="#student">Student</a>&gt;</td>
+<td>An array of students who belong to the specific parent</td>
+</tr>
+</tbody></table>
+<h2 id='project'>Project</h2><pre class="highlight swift tab-swift"><code><span class="c1">// to initialized a project object</span>
+<span class="k">let</span> <span class="nv">projectObject</span><span class="p">:</span> <span class="kt">PFObject</span> <span class="o">=</span> <span class="o">...</span> <span class="c1">// retrieve project from database</span>
+<span class="k">let</span> <span class="nv">project</span> <span class="o">=</span> <span class="kt">Project</span><span class="p">(</span><span class="nv">from</span><span class="p">:</span> <span class="n">projectObject</span><span class="p">)</span>
+</code></pre><pre class="highlight java tab-java"><code><span class="c1">// future Java code</span>
+</code></pre>
+<p>This class contains all information about a student&#39;s project.</p>
+
+<table><thead>
+<tr>
+<th>Identifier</th>
+<th>Data Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>projectName</td>
+<td>String</td>
+<td>The name of the project</td>
+</tr>
+<tr>
+<td>description</td>
+<td>String</td>
+<td>The description of the project</td>
+</tr>
+<tr>
+<td>language</td>
+<td>String</td>
+<td>The programming language of the project</td>
+</tr>
+<tr>
+<td>progress</td>
+<td>String</td>
+<td>Student&#39;s progress on this project</td>
+</tr>
+<tr>
+<td>student</td>
+<td><a href="#student">Student</a></td>
+<td>The student who is working on this project</td>
+</tr>
+</tbody></table>
+
+<aside class="notice">The progress of a project must be set strictly(case sensitive) to "In Progress" or "Finished" or "Presented".</aside>
+<h2 id='debrief'>Debrief</h2>
+<p>This class contains all information about a student&#39;s debrief.</p>
+
+<table><thead>
+<tr>
+<th>Identifier</th>
+<th>Data Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>mentorName</td>
+<td>String</td>
+<td>The name of the mentor</td>
+</tr>
+<tr>
+<td>description</td>
+<td>String</td>
+<td>The debrief content</td>
+</tr>
+<tr>
+<td>mentor</td>
+<td><a href="#mentor">Mentor</a></td>
+<td>The mentor who was working with the student</td>
+</tr>
+<tr>
+<td>date</td>
+<td>Date</td>
+<td>The date which the debrief is created</td>
+</tr>
+</tbody></table>
+<h2 id='others'>Others</h2>
+<p>Other helper data structures.</p>
+<h3 id='day'>Day</h3><pre class="highlight swift tab-swift"><code><span class="c1">// to initialized a day object</span>
+<span class="k">let</span> <span class="nv">day</span> <span class="o">=</span> <span class="kt">Day</span><span class="p">(</span><span class="nv">from</span><span class="p">:</span> <span class="s">"Monday 0900 0400"</span><span class="p">)</span>
+
+<span class="c1">// to convert day into String</span>
+<span class="n">day</span><span class="o">.</span><span class="nf">toTimeString</span><span class="p">()</span> <span class="c1">// "Monday 0900 0400"</span>
+
+<span class="c1">// to display time</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">day</span><span class="p">)</span> <span class="c1">// or day.description will give you "Monday 9:00 - 4:00"</span>
+</code></pre><pre class="highlight java tab-java"><code><span class="c1">// future Java code</span>
+</code></pre>
+<p>This is a structure which contains a weekday and a time range for displaying mentor availability and student attendance.</p>
+
+<table><thead>
+<tr>
+<th>Identifier</th>
+<th>Data Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>day</td>
+<td>String</td>
+<td>The weekday</td>
+</tr>
+<tr>
+<td>timeRange</td>
+<td>Tuple</td>
+<td>The time range in String tuple format: <code>((beginHour, beginMinuet), (endHour, endMinuet))</code></td>
+</tr>
+</tbody></table>
+
+<aside class="notice">This object will be stored as a String in the database, with the format of "Monday 0300 0800" or "Saturday 1100 0240", which mean "Monday 3 to 8 pm" and "Saturday 11am to 2:40pm" respectively.</aside>
+<h1 id='cloud-codes'>Cloud Codes</h1><h1 id='restful-routes'>RESTful Routes</h1>
+<p>In this section you will find request and response params for all the routes. You will find information about each route&#39;s functionality, params for res and req, to help you communicate between server and front-end.</p>
+<h2 id='login'>Login</h2>
+<table><thead>
+<tr>
+<th>URL</th>
+<th>HTTP Verb</th>
+<th>Function</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>/login</td>
+<td>POST</td>
+<td>Login the user</td>
+</tr>
+</tbody></table>
+
+<table><thead>
+<tr>
+<th>param</th>
+<th>HTTP Message</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>username</td>
+<td>request</td>
+<td>Username for the user</td>
+</tr>
+<tr>
+<td>password</td>
+<td>request</td>
+<td>Password for the user</td>
+</tr>
+<tr>
+<td>back</td>
+<td>response</td>
+<td>Redirect back to previous page</td>
+</tr>
+</tbody></table>
+<h2 id='register'>Register</h2>
+<table><thead>
+<tr>
+<th>URL</th>
+<th>HTTP Verb</th>
+<th>Function</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>/register</td>
+<td>POST</td>
+<td>Register a new user</td>
+</tr>
+</tbody></table>
+
+<table><thead>
+<tr>
+<th>param</th>
+<th>HTTP Message</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>username</td>
+<td>request</td>
+<td>Username for the user</td>
+</tr>
+<tr>
+<td>password</td>
+<td>request</td>
+<td>Password for the user</td>
+</tr>
+<tr>
+<td>email</td>
+<td>request</td>
+<td>Email for the user</td>
+</tr>
+<tr>
+<td>back</td>
+<td>response</td>
+<td>Redirect back to previous page</td>
+</tr>
+</tbody></table>
+<h2 id='logout'>Logout</h2>
+<p>Logout function will be handled on server side.</p>
+
+      </div>
+      <div class="dark-box">
+          <div class="lang-selector">
+                <a href="#" data-language-name="swift">Swift</a>
+                <a href="#" data-language-name="java">Java</a>
+                <a href="#" data-language-name="javascript">JavaScript</a>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>
