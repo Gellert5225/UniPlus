@@ -5,9 +5,7 @@
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
  */
-import { get, post }     from 'lib/AJAX';
 import keyMirror         from 'lib/keyMirror';
-import Parse             from 'parse';
 import { Map }           from 'immutable';
 import { registerStore } from 'lib/stores/StoreManager';
 
@@ -29,7 +27,7 @@ function SchemaStore(state, action) {
   switch (action.type) {
     case ActionTypes.FETCH:
       if (state && new Date() - state.get('lastFetch') < 60000) {
-        return Parse.Promise.as(state);
+        return Promise.resolve(state);
       }
       return action.app.apiRequest(
         'GET',

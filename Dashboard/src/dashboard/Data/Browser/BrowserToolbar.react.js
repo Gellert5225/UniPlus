@@ -33,6 +33,7 @@ let BrowserToolbar = ({
   onAddClass,
   onAttachRows,
   onAttachSelectedRows,
+  onCloneSelectedRows,
   onExport,
   onRemoveColumn,
   onDeleteRows,
@@ -40,10 +41,14 @@ let BrowserToolbar = ({
   onChangeCLP,
   onRefresh,
   hidePerms,
+  isUnique,
 
   enableDeleteAllRows,
   enableExportClass,
   enableSecurityDialog,
+
+  enableColumnManipulation,
+  enableClassManipulation,
 }) => {
   let selectionLength = Object.keys(selection).length;
   let details = [];
@@ -55,7 +60,7 @@ let BrowserToolbar = ({
       }
   }
 
-  if (!relation) {
+  if (!relation && !isUnique) {
     if (perms && !hidePerms) {
       let read = perms.get && perms.find && perms.get['*'] && perms.find['*'];
       let write = perms.create && perms.update && perms.delete && perms.create['*'] && perms.update['*'] && perms.delete['*'];
@@ -90,10 +95,10 @@ let BrowserToolbar = ({
     );
   } else {
     menu = (
-      <BrowserMenu title='Edit' icon='edit-solid'>
+      <BrowserMenu title='Edit' icon='edit-solid' disabled={isUnique}>
         <MenuItem text='Add a row' onClick={onAddRow} />
-        <MenuItem text='Add a column' onClick={onAddColumn} />
-        <MenuItem text='Add a class' onClick={onAddClass} />
+        {enableColumnManipulation ? <MenuItem text='Add a column' onClick={onAddColumn} /> : <noscript />}
+        {enableClassManipulation ? <MenuItem text='Add a class' onClick={onAddClass} /> : <noscript />}
         <Separator />
         <MenuItem
           disabled={!selectionLength}
@@ -102,12 +107,18 @@ let BrowserToolbar = ({
         />
         <Separator />
         <MenuItem
+          disabled={!selectionLength}
+          text={`Clone ${selectionLength <= 1 ? 'this row' : 'these rows'}`}
+          onClick={onCloneSelectedRows}
+        />
+        <Separator />
+        <MenuItem
           disabled={selectionLength === 0}
           text={selectionLength === 1 && !selection['*'] ? 'Delete this row' : 'Delete these rows'}
           onClick={() => onDeleteRows(selection)} />
-        <MenuItem text='Delete a column' onClick={onRemoveColumn} />
+        {enableColumnManipulation ? <MenuItem text='Delete a column' onClick={onRemoveColumn} /> : <noscript />}
         {enableDeleteAllRows ? <MenuItem text='Delete all rows' onClick={() => onDeleteRows({ '*': true })} /> : <noscript />}
-        <MenuItem text='Delete this class' onClick={onDropClass} />
+        {enableClassManipulation ? <MenuItem text='Delete this class' onClick={onDropClass} /> : <noscript />}
         {enableExportClass ? <Separator /> : <noscript />}
         {enableExportClass ? <MenuItem text='Export this data' onClick={onExport} /> : <noscript />}
       </BrowserMenu>
@@ -120,6 +131,12 @@ let BrowserToolbar = ({
   } else if (subsection.length > 30) {
     subsection = subsection.substr(0, 30) + '\u2026';
   }
+  const classes = [styles.toolbarButton];
+  let onClick = onAddRow;
+  if (isUnique) {
+    classes.push(styles.toolbarButtonDisabled);
+    onClick = null;
+  }
   return (
     <Toolbar
       relation={relation}
@@ -128,7 +145,7 @@ let BrowserToolbar = ({
       subsection={subsection}
       details={details.join(' \u2022 ')}
     >
-      <a className={styles.toolbarButton} onClick={onAddRow}>
+      <a className={classes.join(' ')} onClick={onClick}>
         <Icon name='plus-solid' width={14} height={14} />
         <span>Add Row</span>
       </a>
@@ -146,7 +163,7 @@ let BrowserToolbar = ({
       <div className={styles.toolbarSeparator} />
       {enableSecurityDialog ? <SecurityDialog
         setCurrent={setCurrent}
-        disabled={!!relation}
+        disabled={!!relation || !!isUnique}
         perms={perms}
         className={classNameForPermissionsEditor}
         onChangeCLP={onChangeCLP}

@@ -18,6 +18,7 @@ import EmptyState                         from 'components/EmptyState/EmptyState
 import ExportDialog                       from 'dashboard/Data/Browser/ExportDialog.react';
 import AttachRowsDialog                   from 'dashboard/Data/Browser/AttachRowsDialog.react';
 import AttachSelectedRowsDialog           from 'dashboard/Data/Browser/AttachSelectedRowsDialog.react';
+import CloneSelectedRowsDialog            from 'dashboard/Data/Browser/CloneSelectedRowsDialog.react';
 import history                            from 'dashboard/history';
 import { List, Map }                      from 'immutable';
 import Notification                       from 'dashboard/Data/Browser/Notification.react';
@@ -31,14 +32,19 @@ import stringCompare                      from 'lib/stringCompare';
 import styles                             from 'dashboard/Data/Browser/Browser.scss';
 import subscribeTo                        from 'lib/subscribeTo';
 import * as ColumnPreferences             from 'lib/ColumnPreferences';
+import * as queryString                   from 'query-string';
+import { Helmet }                         from 'react-helmet';
+import PropTypes                          from 'lib/PropTypes';
+import ParseApp                           from 'lib/ParseApp';
 
+export default
 @subscribeTo('Schema', 'schema')
-export default class Browser extends DashboardView {
+class Browser extends DashboardView {
   constructor() {
     super();
     this.section = 'Core';
-    this.subsection = 'Browser'
-    this.action = new SidebarAction('Create a class', this.showCreateClass.bind(this));
+    this.subsection = 'Browser';
+    this.noteTimeout = null;
 
     this.state = {
       showCreateClassDialog: false,
@@ -51,6 +57,7 @@ export default class Browser extends DashboardView {
 
       relation: null,
       counts: {},
+      filteredCounts: {},
       clp: {},
       filters: new List(),
       ordering: '-createdAt',
@@ -61,7 +68,12 @@ export default class Browser extends DashboardView {
       newObject: null,
 
       lastError: null,
+      lastNote: null,
+
       relationCount: 0,
+
+      isUnique: false,
+      uniqueField: null,
     };
 
     this.prefetchData = this.prefetchData.bind(this);
@@ -80,6 +92,9 @@ export default class Browser extends DashboardView {
     this.showAttachSelectedRowsDialog = this.showAttachSelectedRowsDialog.bind(this);
     this.confirmAttachSelectedRows = this.confirmAttachSelectedRows.bind(this);
     this.cancelAttachSelectedRows = this.cancelAttachSelectedRows.bind(this);
+    this.showCloneSelectedRowsDialog = this.showCloneSelectedRowsDialog.bind(this);
+    this.confirmCloneSelectedRows = this.confirmCloneSelectedRows.bind(this);
+    this.cancelCloneSelectedRows = this.cancelCloneSelectedRows.bind(this);
     this.getClassRelationColumns = this.getClassRelationColumns.bind(this);
     this.showCreateClass = this.showCreateClass.bind(this);
     this.refresh = this.refresh.bind(this);
@@ -98,6 +113,11 @@ export default class Browser extends DashboardView {
   }
 
   componentWillMount() {
+    const { currentApp } = this.context;
+    if (!currentApp.preventSchemaEdits) {
+      this.action = new SidebarAction('Create a class', this.showCreateClass.bind(this));
+    }
+
     this.props.schema.dispatch(ActionTypes.FETCH)
     .then(() => this.handleFetchedSchema());
     if (!this.props.params.className && this.props.schema.data.get('classes')) {
@@ -154,8 +174,11 @@ export default class Browser extends DashboardView {
   extractFiltersFromQuery(props) {
     let filters = new List();
     //TODO: url limit issues ( we may want to check for url limit), unlikely but possible to run into
-    const query = props.location && props.location.query;
-    if (query && query.filters) {
+    if (!props || !props.location || !props.location.search) {
+      return filters;
+    }
+    const query = queryString.parse(props.location.search);
+    if (query.filters) {
       const queryFilters = JSON.parse(query.filters);
       queryFilters.forEach((filter) => filters = filters.push(new Map(filter)));
     }
@@ -209,7 +232,7 @@ export default class Browser extends DashboardView {
     this.props.schema.dispatch(ActionTypes.CREATE_CLASS, { className }).then(() => {
       this.state.counts[className] = 0;
       history.push(this.context.generatePath('browser/' + className));
-    }).always(() => {
+    }).finally(() => {
       this.setState({ showCreateClassDialog: false });
     });
   }
@@ -224,12 +247,13 @@ export default class Browser extends DashboardView {
       if (msg) {
         msg = msg[0].toUpperCase() + msg.substr(1);
       }
-      this.setState({ lastError: msg });
+
+      this.showNote(msg, true);
     });
   }
 
   exportClass(className) {
-    this.context.currentApp.exportClass(className).always(() => {
+    this.context.currentApp.exportClass(className).finally(() => {
       this.setState({ showExportDialog: false });
     });
   }
@@ -241,7 +265,7 @@ export default class Browser extends DashboardView {
       name: name,
       targetClass: target
     };
-    this.props.schema.dispatch(ActionTypes.ADD_COLUMN, payload).always(() => {
+    this.props.schema.dispatch(ActionTypes.ADD_COLUMN, payload).finally(() => {
       this.setState({ showAddColumnDialog: false });
     });
   }
@@ -262,7 +286,7 @@ export default class Browser extends DashboardView {
       className: this.props.params.className,
       name: name
     };
-    this.props.schema.dispatch(ActionTypes.DROP_COLUMN, payload).always(() => {
+    this.props.schema.dispatch(ActionTypes.DROP_COLUMN, payload).finally(() => {
       let state = { showRemoveColumnDialog: false };
       if (this.state.ordering === name || this.state.ordering === '-' + name) {
         state.ordering = '-createdAt';
@@ -311,18 +335,44 @@ export default class Browser extends DashboardView {
       query.ascending(field)
     }
 
-    if (field !== 'createdAt') {
-      query.addDescending('createdAt');
-    }
-
     query.limit(200);
-    const data = await query.find({ useMasterKey: true });
+
+    let promise = query.find({ useMasterKey: true });
+    let isUnique = false;
+    let uniqueField = null;
+    filters.forEach(async (filter) => {
+      if (filter.get('constraint') == 'unique') {
+        const field = filter.get('field');
+        promise = query.distinct(field);
+        isUnique = true;
+        uniqueField = field;
+      }
+    });
+    await this.setState({ isUnique, uniqueField });
+
+    const data = await promise;
     return data;
   }
 
-  async fetchData(source, filters = new List(), last) {
+  async fetchParseDataCount(source, filters) {
+    const query = queryFromFilters(source, filters);
+    const count = await query.count({ useMasterKey: true });
+    return count;
+  }
+
+  async fetchData(source, filters = new List()) {
     const data = await this.fetchParseData(source, filters);
-    this.setState({ data: data, filters, lastMax: 200 });
+    var filteredCounts = { ...this.state.filteredCounts };
+    if (filters.size > 0) {
+      if (this.state.isUnique) {
+        filteredCounts[source] = data.length;
+      } else {
+        filteredCounts[source] = await this.fetchParseDataCount(source, filters);
+      }
+    } else {
+      delete filteredCounts[source];
+    }
+    this.setState({ data: data, filters, lastMax: 200 , filteredCounts: filteredCounts});
   }
 
   async fetchRelation(relation, filters = new List()) {
@@ -343,7 +393,7 @@ export default class Browser extends DashboardView {
   }
 
   fetchNextPage() {
-    if (!this.state.data) {
+    if (!this.state.data || this.state.isUnique) {
       return null;
     }
     let className = this.props.params.className;
@@ -467,8 +517,13 @@ export default class Browser extends DashboardView {
     } else {
       obj.set(attr, value);
     }
-    obj.save(null, { useMasterKey: true }).then(() => {
-      const state = { data: this.state.data, lastError: null };
+    obj.save(null, { useMasterKey: true }).then((objectSaved) => {
+      const createdOrUpdated = isNewObject ? "created" : "updated";
+      let msg = objectSaved.className + " with id '" + objectSaved.id + "' " + createdOrUpdated;
+      this.showNote(msg, false);
+
+      const state = { data: this.state.data };
+
       if (isNewObject) {
         const relation = this.state.relation;
         if (relation) {
@@ -495,7 +550,8 @@ export default class Browser extends DashboardView {
               msg = msg[0].toUpperCase() + msg.substr(1);
             }
             obj.set(attr, prev);
-            this.setState({ data: this.state.data, lastError: msg });
+            this.setState({ data: this.state.data });
+            this.showNote(msg, true);
           });
         } else {
           state.newObject = null;
@@ -513,10 +569,10 @@ export default class Browser extends DashboardView {
       }
       if (!isNewObject) {
         obj.set(attr, prev);
-        this.setState({ data: this.state.data, lastError: msg });
-      } else {
-        this.setState({ lastError: msg });
+        this.setState({ data: this.state.data });
       }
+
+      this.showNote(msg, true);
     });
   }
 
@@ -548,6 +604,10 @@ export default class Browser extends DashboardView {
           toDelete.push(this.state.data[i]);
         }
       }
+
+      const toDeleteObjectIds = [];
+      toDelete.forEach((obj) => { toDeleteObjectIds.push(obj.id); });
+
       let relation = this.state.relation;
       if (relation && toDelete.length) {
         relation.remove(toDelete);
@@ -563,6 +623,16 @@ export default class Browser extends DashboardView {
         });
       } else if (toDelete.length) {
         Parse.Object.destroyAll(toDelete, { useMasterKey: true }).then(() => {
+          let deletedNote;
+
+          if (toDeleteObjectIds.length == 1) {
+            deletedNote = className + " with id '" + toDeleteObjectIds[0] + "' deleted";
+          } else {
+            deletedNote = toDeleteObjectIds.length + " " + className + " objects deleted";
+          }
+
+          this.showNote(deletedNote, false);
+
           if (this.props.params.className === className) {
             for (let i = 0; i < indexes.length; i++) {
               this.state.data.splice(indexes[i] - i, 1);
@@ -570,6 +640,26 @@ export default class Browser extends DashboardView {
             this.state.counts[className] -= indexes.length;
             this.forceUpdate();
           }
+        }, (error) => {
+          let errorDeletingNote = null;
+
+          if (error.code === Parse.Error.AGGREGATE_ERROR) {
+            if (error.errors.length == 1) {
+              errorDeletingNote = "Error deleting " + className + " with id '" + error.errors[0].object.id + "'";
+            } else if (error.errors.length < toDeleteObjectIds.length) {
+              errorDeletingNote = "Error deleting " + error.errors.length + " out of " + toDeleteObjectIds.length + " " + className + " objects";
+            } else {
+              errorDeletingNote = "Error deleting all " + error.errors.length + " " + className + " objects";
+            }
+          } else {
+            if (toDeleteObjectIds.length == 1) {
+              errorDeletingNote = "Error deleting " + className + " with id '" + toDeleteObjectIds[0] + "'";
+            } else {
+              errorDeletingNote = "Error deleting " + toDeleteObjectIds.length + " " + className + " objects";
+            }
+          }
+
+          this.showNote(errorDeletingNote, true);
         });
       }
     }
@@ -598,7 +688,8 @@ export default class Browser extends DashboardView {
       this.state.showExportDialog ||
       this.state.rowsToDelete ||
       this.state.showAttachRowsDialog ||
-      this.state.showAttachSelectedRowsDialog
+      this.state.showAttachSelectedRowsDialog ||
+      this.state.showCloneSelectedRowsDialog
     );
   }
 
@@ -626,7 +717,7 @@ export default class Browser extends DashboardView {
     const missedObjectsCount = objectIds.length - objects.length;
     if (missedObjectsCount) {
       const missedObjects = [];
-      objectIds.forEach((objectId, idx) => {
+      objectIds.forEach((objectId) => {
         const object = objects.find(x => x.id === objectId);
         if (!object) {
           missedObjects.push(objectId);
@@ -671,6 +762,41 @@ export default class Browser extends DashboardView {
     await parent.save(null, { useMasterKey: true });
     this.setState({
       selection: {},
+    });
+  }
+
+  showCloneSelectedRowsDialog() {
+    this.setState({
+      showCloneSelectedRowsDialog: true,
+    });
+  }
+
+  cancelCloneSelectedRows() {
+    this.setState({
+      showCloneSelectedRowsDialog: false,
+    });
+  }
+
+  async confirmCloneSelectedRows() {
+    const objectIds = [];
+    for (const objectId in this.state.selection) {
+      objectIds.push(objectId);
+    }
+    const query = new Parse.Query(this.props.params.className);
+    query.containedIn('objectId', objectIds);
+    const objects = await query.find({ useMasterKey: true });
+    const toClone = [];
+    for (const object of objects) {
+      toClone.push(object.clone());
+    }
+    await Parse.Object.saveAll(toClone, { useMasterKey: true });
+    this.setState({
+      selection: {},
+      data: [
+        ...toClone,
+        ...this.state.data,
+      ],
+      showCloneSelectedRowsDialog: false,
     });
   }
 
@@ -735,6 +861,24 @@ export default class Browser extends DashboardView {
     );
   }
 
+  showNote(message, isError) {
+    if (!message) {
+      return;
+    }
+
+    clearTimeout(this.noteTimeout);
+
+    if (isError) {
+      this.setState({ lastError: message, lastNote: null });
+    } else {
+      this.setState({ lastNote: message, lastError: null });
+    }
+
+    this.noteTimeout = setTimeout(() => {
+      this.setState({ lastError: null, lastNote: null });
+    }, 3500);
+  }
+
   renderContent() {
     let browser = null;
     let className = this.props.params.className;
@@ -766,9 +910,15 @@ export default class Browser extends DashboardView {
         let columns = {
           objectId: { type: 'String' }
         };
+        if (this.state.isUnique) {
+          columns = {};
+        }
         let userPointers = [];
         classes.get(className).forEach((field, name) => {
           if (name === 'objectId') {
+            return;
+          }
+          if (this.state.isUnique && name !== this.state.uniqueField) {
             return;
           }
           let info = { type: field.type };
@@ -781,9 +931,21 @@ export default class Browser extends DashboardView {
           columns[name] = info;
         });
 
+        var count;
+        if (this.state.relation) {
+          count = this.state.relationCount;
+        } else {
+          if (className in this.state.filteredCounts) {
+            count = this.state.filteredCounts[className];
+          } else {
+            count = this.state.counts[className];
+          }
+        }
         browser = (
           <DataBrowser
-            count={this.state.relation ? this.state.relationCount : this.state.counts[className]}
+            isUnique={this.state.isUnique}
+            uniqueField={this.state.uniqueField}
+            count={count}
             perms={this.state.clp[className]}
             schema={schema}
             userPointers={userPointers}
@@ -797,6 +959,7 @@ export default class Browser extends DashboardView {
             onRefresh={this.refresh}
             onAttachRows={this.showAttachRowsDialog}
             onAttachSelectedRows={this.showAttachSelectedRowsDialog}
+            onCloneSelectedRows={this.showCloneSelectedRowsDialog}
 
             columns={columns}
             className={className}
@@ -863,6 +1026,7 @@ export default class Browser extends DashboardView {
           onCancel={() => this.setState({
             showDropClassDialog: false,
             lastError: null,
+            lastNote: null,
           })}
           onConfirm={() => this.dropClass(className)} />
       );
@@ -891,13 +1055,42 @@ export default class Browser extends DashboardView {
           onConfirm={this.confirmAttachSelectedRows}
         />
       );
+    } else if (this.state.showCloneSelectedRowsDialog) {
+      extras = (
+        <CloneSelectedRowsDialog
+          className={className}
+          selection={this.state.selection}
+          onCancel={this.cancelCloneSelectedRows}
+          onConfirm={this.confirmCloneSelectedRows}
+        />
+      );
+    }
+
+    let notification = null;
+    const pageTitle = `${this.props.params.className} - Parse Dashboard`;
+
+    if (this.state.lastError) {
+      notification = (
+        <Notification note={this.state.lastError} isErrorNote={true}/>
+      );
+    } else if (this.state.lastNote) {
+      notification = (
+        <Notification note={this.state.lastNote} isErrorNote={false}/>
+      );
     }
     return (
       <div>
+        <Helmet>
+          <title>{pageTitle}</title>
+        </Helmet>
         {browser}
-        <Notification note={this.state.lastError} />
+        {notification}
         {extras}
       </div>
     );
   }
 }
+
+Browser.contextTypes = {
+  currentApp: PropTypes.instanceOf(ParseApp)
+};

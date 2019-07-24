@@ -31,6 +31,7 @@ function compareValue(info, value, onChangeCompareTo, active) {
   switch (info.type) {
     case null:
       return null;
+    case 'Object':
     case 'String':
       return <input type='text' value={value} onChange={(e) => onChangeCompareTo(e.target.value)} ref={setFocus}/>;
     case 'Pointer':
@@ -48,7 +49,20 @@ function compareValue(info, value, onChangeCompareTo, active) {
     case 'Boolean':
       return <ChromeDropdown color={active ? 'blue' : 'purple'} value={value ? 'True' : 'False'} options={['True', 'False']} onChange={(val) => onChangeCompareTo(val === 'True')} />;
     case 'Number':
-      return <input type='text' value={value} onChange={(e) => onChangeCompareTo(validateNumeric(e.target.value) ? parseFloat(e.target.value) : (parseFloat(value) || ''))} />;
+      return (
+        <input
+          type='text'
+          value={value}
+          onChange={(e) => {
+            let val = value;
+            if (!e.target.value.length || e.target.value === '-') {
+              val = e.target.value;
+            } else if (validateNumeric(e.target.value)) {
+              val = parseFloat(e.target.value);
+            }
+            onChangeCompareTo(val);
+          }} />
+      );
     case 'Date':
       return (
         <DateTimeEntry
@@ -81,7 +95,7 @@ let FilterRow = ({
       options={fields}
       onChange={onChangeField} />
     <ChromeDropdown
-      width={compareInfo.type ? 175 : 325}
+      width={compareInfo.type ? '175' : '325'}
       color={active ? 'blue' : 'purple'}
       value={Constraints[currentConstraint].name}
       options={constraints.map((c) => Constraints[c].name)}

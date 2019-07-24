@@ -27,11 +27,8 @@ import ReactDOM                  from 'react-dom';
 import styles                    from 'dashboard/Analytics/Explorer/Explorer.scss';
 import stylesTable               from 'components/Table/Table.scss';
 import subscribeTo               from 'lib/subscribeTo';
-import TableHeader               from 'components/Table/TableHeader.react';
 import Toolbar                   from 'components/Toolbar/Toolbar.react';
 import { verticalCenter }        from 'stylesheets/base.scss';
-
-const XHR_KEY = 'Explorer';
 
 let buildFriendlyName = (query) => {
   let name = [query.source];
@@ -42,8 +39,9 @@ let buildFriendlyName = (query) => {
   return name.join(' ');
 };
 
+export default
 @subscribeTo('AnalyticsQuery', 'customQueries')
-export default class Explorer extends DashboardView {
+class Explorer extends DashboardView {
   constructor() {
     super();
     this.section = 'Analytics';
@@ -223,7 +221,7 @@ export default class Explorer extends DashboardView {
       promises.push(promise);
       this.xhrHandles.push(xhr);
     });
-    Parse.Promise.when(promises).then(() => this.setState({
+    Promise.all(promises).then(() => this.setState({
       loading: false,
       mutated: false
     }));

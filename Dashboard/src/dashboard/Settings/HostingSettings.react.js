@@ -20,7 +20,6 @@ import TextInput               from 'components/TextInput/TextInput.react';
 import Toggle                  from 'components/Toggle/Toggle.react';
 import Toolbar                 from 'components/Toolbar/Toolbar.react';
 import unique                  from 'lib/unique';
-import { Promise }             from 'parse';
 
 export default class HostingSettings extends DashboardView {
 	constructor() {
@@ -37,7 +36,7 @@ export default class HostingSettings extends DashboardView {
 		};
 	}
 
-	renderForm({changes, fields, setField, resetFields}) {
+	renderForm({fields, setField}) {
 		let hostingSubdomainFields = <Fieldset
 			legend="Hosting Subdomain"
 			description="Content from your public directory will be served to users that visit this address.">
@@ -97,9 +96,9 @@ export default class HostingSettings extends DashboardView {
 							sslPublicCertError: '',
 						});
 						//TODO: do something here to indicate success and/or upload when you click the FlowView save button rather than immediately
-						this.context.currentApp.uploadSSLPublicCertificate(file).fail(({ error }) => {
+						this.context.currentApp.uploadSSLPublicCertificate(file).catch(({ error }) => {
 							this.setState({ sslPublicCertError: error });
-						}).always(() => {
+						}).finally(() => {
 							this.setState({ sslPublicCertUploading: false });
 						});
 					}} />
@@ -121,11 +120,11 @@ export default class HostingSettings extends DashboardView {
 						this.setState({
 							sslPrivateKeyUploading: true,
 							sslPrivateKeyError: '',
-					  });
+						});
 						//TODO: do something here to indicate success and/or upload when you click the FlowView save button rather than immediately
-						this.context.currentApp.uploadSSLPrivateKey(file).fail(({ error }) => {
+						this.context.currentApp.uploadSSLPrivateKey(file).catch(({ error }) => {
 							this.setState({ sslPrivateKeyError: error });
-						}).always(() => {
+						}).finally(() => {
 							this.setState({ sslPrivateKeyUploading: false });
 						});
 					}} />
@@ -297,20 +296,16 @@ export default class HostingSettings extends DashboardView {
 			initialFields={initialFields}
 			footerContents={({changes}) => renderFlowFooterChanges(changes, initialFields, hostingFieldOptions)}
 			onSubmit={({ changes, setField }) => {
-				let promise = new Promise();
-				this.props.saveChanges(changes).then(({ successes, failures }) => {
+				return this.props.saveChanges(changes).then(({ successes, failures }) => {
 					for (let k in successes) {
 						setField(k, successes[k]);
 					}
 					if (Object.keys(failures).length > 0) {
-						promise.reject({ error: Object.values(failures).join(' ') });
-					} else {
-						promise.resolve();
+						return Promise.reject({ error: Object.values(failures).join(' ') });
 					}
-				}).fail(({ error, failures = {} }) => {
-					promise.reject({ error: unique(Object.values(failures).concat(error)).join(' ') });
+				}).catch(({ error, failures = {} }) => {
+					return Promise.reject({ error: unique(Object.values(failures).concat(error)).join(' ') });
 				});
-				return promise;
 			}}
 			validate={() => '' /*TODO: do some validation*/}
 			renderForm={this.renderForm.bind(this)}

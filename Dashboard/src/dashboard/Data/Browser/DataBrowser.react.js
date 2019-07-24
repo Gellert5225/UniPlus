@@ -10,6 +10,7 @@ import BrowserToolbar         from 'dashboard/Data/Browser/BrowserToolbar.react'
 import * as ColumnPreferences from 'lib/ColumnPreferences';
 import ParseApp               from 'lib/ParseApp';
 import React                  from 'react';
+import PropTypes              from 'lib/PropTypes';
 import { SpecialClasses }     from 'lib/Constants';
 
 /**
@@ -50,7 +51,8 @@ export default class DataBrowser extends React.Component {
         current: null,
         editing: false,
       });
-    } else if (Object.keys(props.columns).length !== Object.keys(this.props.columns).length) {
+    } else if (Object.keys(props.columns).length !== Object.keys(this.props.columns).length
+           || (props.isUnique && props.uniqueField !== this.props.uniqueField)) {
       let order = ColumnPreferences.getOrder(
         props.columns,
         context.currentApp.applicationId,
@@ -188,6 +190,7 @@ export default class DataBrowser extends React.Component {
 
   render() {
     let { className, ...other } = this.props;
+    const { preventSchemaEdits } = this.context.currentApp;
     return (
       <div>
         <BrowserTable
@@ -205,9 +208,11 @@ export default class DataBrowser extends React.Component {
           className={SpecialClasses[className] || className}
           classNameForPermissionsEditor={className}
           setCurrent={this.setCurrent.bind(this)}
-          enableDeleteAllRows={this.context.currentApp.serverInfo.features.schemas.clearAllDataFromClass}
-          enableExportClass={this.context.currentApp.serverInfo.features.schemas.exportClass}
-          enableSecurityDialog={this.context.currentApp.serverInfo.features.schemas.editClassLevelPermissions}
+          enableDeleteAllRows={this.context.currentApp.serverInfo.features.schemas.clearAllDataFromClass && !preventSchemaEdits}
+          enableExportClass={this.context.currentApp.serverInfo.features.schemas.exportClass && !preventSchemaEdits}
+          enableSecurityDialog={this.context.currentApp.serverInfo.features.schemas.editClassLevelPermissions && !preventSchemaEdits}
+          enableColumnManipulation={!preventSchemaEdits}
+          enableClassManipulation={!preventSchemaEdits}
           {...other}/>
       </div>
     );
@@ -215,5 +220,5 @@ export default class DataBrowser extends React.Component {
 }
 
 DataBrowser.contextTypes = {
-  currentApp: React.PropTypes.instanceOf(ParseApp)
+  currentApp: PropTypes.instanceOf(ParseApp)
 };

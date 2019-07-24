@@ -13,14 +13,12 @@ import Label              from 'components/Label/Label.react';
 import Modal              from 'components/Modal/Modal.react';
 import Option             from 'components/Dropdown/Option.react';
 import React              from 'react';
-import { DataTypes } from 'lib/Constants';
-import TextInput          from 'components/TextInput/TextInput.react';
 
 export default class RemoveColumnDialog extends React.Component {
-  constructor(props) {
+  constructor() {
     super();
     this.state = {
-      name: props.currentColumns[0]
+      name: null
     };
   }
 
@@ -36,6 +34,7 @@ export default class RemoveColumnDialog extends React.Component {
             }
           input={
             <Dropdown
+              placeHolder='Select a column'
               value={this.state.name}
               onChange={(name) => this.setState({ name: name })}>
               {this.props.currentColumns.map((t) => <Option key={t} value={t}>{t}</Option>)}
@@ -52,6 +51,7 @@ export default class RemoveColumnDialog extends React.Component {
         confirmText='Remove column'
         cancelText={'Never mind, don\u2019t.'}
         onCancel={this.props.onCancel}
+        disabled={!this.state.name}
         onConfirm={() => {
           this.props.onConfirm(this.state.name);
         }}

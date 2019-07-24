@@ -4,4 +4,7 @@
 [submodule "Server Dev"]
 	path = Server/Dev
 	url = https://github.com/Gellert5225/UniPlus-Server-Dev.git
+[submodule "Server Prod"]
+	path = Server/Prod
+	url = https://git.heroku.com/uniplusserver.git
 

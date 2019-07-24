@@ -22,7 +22,7 @@ export default class FlowView extends React.Component {
     };
   }
 
-  componentWillReceiveProps(props, context) {
+  componentWillReceiveProps(props) {
     let newChanges = {...this.state.changes};
     for (let k in props.initialFields) {
       if (this.state.changes[k] === props.initialFields[k]) {
@@ -130,7 +130,7 @@ export default class FlowView extends React.Component {
         onSubmit({ changes, fields, setField, resetFields }).then(() => {
           this.setState({ saveState: SaveButton.States.SUCCEEDED });
           afterSave({ fields, setField, resetFields });
-        }).fail(({ message, error, notice, errors = [] }) => {
+        }).catch(({ message, error, notice, errors = [] }) => {
           this.setState({
             saveState: SaveButton.States.FAILED,
             saveError: errors.join(' ') || message || error || notice || 'An error occurred',

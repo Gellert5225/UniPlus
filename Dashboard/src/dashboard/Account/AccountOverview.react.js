@@ -7,7 +7,6 @@
  */
 import AccountLinkField from 'dashboard/Account/AccountLinkField.react.js'
 import AccountManager          from 'lib/AccountManager';
-import CreditCardInput         from 'components/CreditCardInput/CreditCardInput.react';
 import Field                   from 'components/Field/Field.react';
 import Fieldset                from 'components/Fieldset/Fieldset.react';
 import FlowView                from 'components/FlowView/FlowView.react';
@@ -19,7 +18,6 @@ import KeyField                from 'components/KeyField/KeyField.react';
 import Label                   from 'components/Label/Label.react';
 import Modal                   from 'components/Modal/Modal.react';
 import MoneyInput              from 'components/MoneyInput/MoneyInput.react';
-import Parse                   from 'parse';
 import React                   from 'react';
 import renderFlowFooterChanges from 'lib/renderFlowFooterChanges';
 import styles                  from 'dashboard/Settings/Settings.scss';
@@ -68,7 +66,7 @@ export default class AccountOverview extends React.Component {
     AccountManager.abortFetch(XHR_KEY);
   }
 
-  renderForm({changes, fields, setField, resetFields}) {
+  renderForm({fields}) {
     let accountInfoFields = <Fieldset
       legend='Account Info'
       description='Update the personal information linked to this account.'>
@@ -372,10 +370,12 @@ export default class AccountOverview extends React.Component {
       footerContents={({changes}) => renderFlowFooterChanges(changes, initialFields, accountOverviewFooterSettings)}
       onSubmit={() => {
         let promiseList = [];
+        /* eslint-disable */
         if (changes.cc !== undefined) {
           //TODO change credit card number
         }
-        return Parse.Promise.when(promiseList);
+        /* eslint-enable */
+        return Promise.all(promiseList);
       }}
       renderForm={this.renderForm.bind(this)} />;
   }

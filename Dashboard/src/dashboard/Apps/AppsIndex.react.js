@@ -5,22 +5,18 @@
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
  */
-import AccountView   from 'dashboard/AccountView.react';
 import AppsManager   from 'lib/AppsManager';
 import FlowFooter    from 'components/FlowFooter/FlowFooter.react';
 import history       from 'dashboard/history';
-import howLongAgo    from 'lib/howLongAgo';
 import html          from 'lib/htmlString';
 import Icon          from 'components/Icon/Icon.react';
 import joinWithFinal from 'lib/joinWithFinal';
 import LiveReload    from 'components/LiveReload/LiveReload.react';
-import pluralize     from 'lib/pluralize';
 import prettyNumber  from 'lib/prettyNumber';
 import React         from 'react';
 import styles        from 'dashboard/Apps/AppsIndex.scss';
 import { center }    from 'stylesheets/base.scss';
-import { Link }      from 'react-router';
-import AppBadge         from 'components/AppBadge/AppBadge.react';
+import AppBadge      from 'components/AppBadge/AppBadge.react';
 
 function dash(value, content) {
   if (value === undefined) {
@@ -31,8 +27,9 @@ function dash(value, content) {
   }
   return content;
 }
-
+/* eslint-disable no-unused-vars */
 let CloningNote = ({ app, clone_status, clone_progress }) => {
+/* eslint-enable */
   if (clone_status === 'failed') {
     //TODO: add a way to delete failed clones, like in old dash
     return <div>Clone failed</div>
@@ -75,7 +72,7 @@ let AppCard = ({
     Server version: <span className={styles.ago}>{app.serverInfo.parseServerVersion || 'unknown'}</span>
     </div>;
 
-  return <li onClick={canBrowse}>
+  return <li onClick={canBrowse} style={{ background: app.primaryBackgroundColor }}>
     <a className={styles.icon}>
       {icon ? <img src={'appicons/' + icon} width={56} height={56}/> : <Icon width={56} height={56} name='blank-app-outline' fill='#1E384D' />}
     </a>
@@ -99,6 +96,11 @@ export default class AppsIndex extends React.Component {
   }
 
   componentWillMount() {
+    if (AppsManager.apps().length === 1) {
+      const [app] = AppsManager.apps();
+      history.push(`/apps/${app.slug}/browser`);
+      return;
+    }
     document.body.addEventListener('keydown', this.focusField);
     AppsManager.getAllAppsIndexStats().then(() => {
       this.forceUpdate();
@@ -134,7 +136,6 @@ export default class AppsIndex extends React.Component {
         </div>
       );
     }
-    apps.sort((a, b) => a.createdAt > b.createdAt ? -1 : (a.createdAt < b.createdAt ? 1 : 0));
     let upgradePrompt = null;
     if (this.props.newFeaturesInLatestVersion.length > 0) {
       let newFeaturesNodes = this.props.newFeaturesInLatestVersion.map(feature => <strong>

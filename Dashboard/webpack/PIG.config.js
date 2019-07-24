@@ -7,7 +7,8 @@
  */
 var configuration = require('./base.config.js');
 
+configuration.mode = 'development';
 configuration.entry = {PIG: './parse-interface-guide/index.js'};
-configuration.output.path = './PIG/bundles';
+configuration.output.path = require('path').resolve('./PIG/bundles');
 
 module.exports = configuration;

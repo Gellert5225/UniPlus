@@ -48,6 +48,11 @@ export const Constraints = {
   ends: {
     name: 'ends with',
   },
+  stringContainsString: {
+    name: 'string contains string',
+    field: 'String',
+    composable: true,
+  },
   before: {
     name: 'is before',
     field: 'Date',
@@ -85,15 +90,72 @@ export const Constraints = {
   doesNotContainAny: {
     name: 'does not contain',
     field: 'Array',
-  }
+  },
+  keyExists: {
+    name: 'key exists',
+    field: 'Object',
+    composable: true
+  },
+  keyDne: {
+    name: 'key does not exist',
+    field: 'Object',
+    composable: true
+  },
+  keyEq: {
+    name: 'key equals',
+    field: 'Object',
+    composable: true
+  },
+  keyNeq: {
+    name: 'key does not equal',
+    field: 'Object',
+    composable: true
+  },
+  keyGt: {
+    name: 'key greater than',
+    field: 'Object',
+    composable: true
+  },
+  keyGte: {
+    name: 'key greater than/equal',
+    field: 'Object',
+    composable: true
+  },
+  keyLt: {
+    name: 'key less than',
+    field: 'Object',
+    composable: true
+  },
+  keyLte: {
+    name: 'key less than/equal',
+    field: 'Object',
+    composable: true
+  },
+  unique: {
+    name: 'unique',
+    field: null
+  },
 };
 
 export const FieldConstraints = {
-  'Pointer': [ 'exists', 'dne', 'eq', 'neq'],
-  'Boolean': [ 'exists', 'dne', 'eq' ],
-  'Number': [ 'exists', 'dne', 'eq', 'neq', 'lt', 'lte', 'gt', 'gte' ],
-  'String': [ 'exists', 'dne', 'eq', 'neq', 'starts', 'ends' ],
-  'Date': [ 'exists', 'dne', 'before', 'after' ],
+  'Pointer': [ 'exists', 'dne', 'eq', 'neq', 'unique' ],
+  'Boolean': [ 'exists', 'dne', 'eq', 'unique' ],
+  'Number': [ 'exists', 'dne', 'eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'unique' ],
+  'String': [ 'exists', 'dne', 'eq', 'neq', 'starts', 'ends', 'stringContainsString', 'unique' ],
+  'Date': [ 'exists', 'dne', 'before', 'after', 'unique' ],
+  'Object': [
+    'exists',
+    'dne',
+    'keyExists',
+    'keyDne',
+    'keyEq',
+    'keyNeq',
+    'keyGt',
+    'keyGte',
+    'keyLt',
+    'keyLte',
+    'unique',
+  ],
   'Array': [
     'exists',
     'dne',
@@ -111,6 +173,7 @@ export const DefaultComparisons = {
   'Boolean': false,
   'Number': '',
   'String': '',
+  'Object': '',
   'Date': Parse._encode(new Date()),
 };
 
@@ -140,4 +203,4 @@ export function availableFilters(schema, currentFilters, blacklist) {
     available[col] = FieldConstraints[type].filter((c) => blacklist.indexOf(c) < 0);
   }
   return available;
-};
+}

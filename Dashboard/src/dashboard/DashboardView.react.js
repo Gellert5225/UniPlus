@@ -5,6 +5,7 @@
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
  */
+import PropTypes     from 'lib/PropTypes';
 import ParseApp      from 'lib/ParseApp';
 import React         from 'react';
 import Sidebar       from 'components/Sidebar/Sidebar.react';
@@ -22,7 +23,8 @@ export default class DashboardView extends React.Component {
     let appSlug = (this.context.currentApp ? this.context.currentApp.slug : '');
 
     if (!this.context.currentApp.hasCheckedForMigraton) {
-      this.context.currentApp.getMigrations().promise.then(() => this.forceUpdate());
+      this.context.currentApp.getMigrations().promise
+        .then(() => this.forceUpdate(), () => {});
     }
 
     let features = this.context.currentApp.serverInfo.features;
@@ -47,14 +49,12 @@ export default class DashboardView extends React.Component {
     }
 
     //webhooks requires removal of heroku link code, then it should work.
-    /*
     if (features.hooks && features.hooks.create && features.hooks.read && features.hooks.update && features.hooks.delete) {
       coreSubsections.push({
         name: 'Webhooks',
         link: '/webhooks'
       });
     }
-    */
 
     if (features.cloudCode && features.cloudCode.jobs) {
       coreSubsections.push({
@@ -233,7 +233,7 @@ export default class DashboardView extends React.Component {
         link: '/settings',
         subsections: settingsSections
       });
-    };
+    }
 
     let sidebar = (
     <Sidebar
@@ -242,7 +242,10 @@ export default class DashboardView extends React.Component {
       section={this.section}
       subsection={this.subsection}
       prefix={'/apps/' + appSlug}
-      action={this.action}>
+      action={this.action}
+      primaryBackgroundColor={this.context.currentApp.primaryBackgroundColor}
+      secondaryBackgroundColor={this.context.currentApp.secondaryBackgroundColor}
+      >
       {sidebarChildren}
     </Sidebar>);
 
@@ -259,6 +262,6 @@ export default class DashboardView extends React.Component {
 }
 
 DashboardView.contextTypes = {
-  generatePath: React.PropTypes.func,
-  currentApp: React.PropTypes.instanceOf(ParseApp)
+  generatePath: PropTypes.func,
+  currentApp: PropTypes.instanceOf(ParseApp)
 };

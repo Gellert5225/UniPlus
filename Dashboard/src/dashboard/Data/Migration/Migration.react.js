@@ -31,8 +31,6 @@ const MIGRATION_DONE = 6;
 const MIGRATION_FATALED = 7;
 const MIGRATION_STOPPED = 8;
 
-const MONGO_KEY_PREFIX_LENGTH = 41;
-
 let StatusBarNote = ({note, value}) => <span className={styles.statusNote}>
   {note}<span className={styles.infoText}>{value}</span>
 </span>;
@@ -153,7 +151,7 @@ export default class Migration extends DashboardView {
               onClick={()=>{
                 this.setState({stoppingState: AsyncStatus.PROGRESS});
                 //No need to handle failure of this request becase it's really rare and it doesn't really matter if the user doesn't realize it failed.
-                this.context.currentApp.stopMigration().always(() => {
+                this.context.currentApp.stopMigration().finally(() => {
                   this.setState({stoppingState: AsyncStatus.WAITING});
                 });
               }}/>
@@ -181,7 +179,6 @@ export default class Migration extends DashboardView {
               showFinalizeButton = true;
               break;
             case MIGRATION_STOPPED:
-            case MIGRATION_NOTSTARTED:
             case MIGRATION_INITIALSYNC:
               longStateDescription =
               <div>
@@ -321,7 +318,7 @@ export default class Migration extends DashboardView {
               commitingState: AsyncStatus.SUCCESS,
               commitDialogOpen: false,
             });
-          }).fail(() => {
+          }).catch(() => {
             this.setState({commitingState: AsyncStatus.FAILED});
           });
         }}

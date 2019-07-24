@@ -5,7 +5,7 @@
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
  */
-import { dateStringUTC, isDate } from 'lib/DateUtils';
+import { dateStringUTC }         from 'lib/DateUtils';
 import getFileName               from 'lib/getFileName';
 import Parse                     from 'parse';
 import Pill                      from 'components/Pill/Pill.react';
@@ -13,7 +13,7 @@ import React                     from 'react';
 import styles                    from 'components/BrowserCell/BrowserCell.scss';
 import { unselectable }          from 'stylesheets/base.scss';
 
-let BrowserCell = ({ type, value, hidden, width, current, onSelect, readonly, onEditChange, setRelation,  onPointerClick }) => {
+let BrowserCell = ({ type, value, hidden, width, current, onSelect, onEditChange, setRelation,  onPointerClick }) => {
   let content = value;
   let classes = [styles.cell, unselectable];
   if (hidden) {
@@ -29,30 +29,43 @@ let BrowserCell = ({ type, value, hidden, width, current, onSelect, readonly, on
   } else if (value === null) {
     content = '(null)';
     classes.push(styles.empty);
+  } else if (value === '') {
+    content = <span>&nbsp;</span>;
+    classes.push(styles.empty);
   } else if (type === 'Pointer') {
+    if (value && value.__type) {
+      const object = new Parse.Object(value.className);
+      object.id = value.objectId;
+      value = object;
+    }
     content = (
       <a href='javascript:;' onClick={onPointerClick.bind(undefined, value)}>
         <Pill value={value.id} />
       </a>
     );
   } else if (type === 'Date') {
+    if (typeof value === 'object' && value.__type) {
+      value = new Date(value.iso);
+    } else if (typeof value === 'string') {
+      value = new Date(value);
+    }
     content = dateStringUTC(value);
   } else if (type === 'Boolean') {
     content = value ? 'True' : 'False';
   } else if (type === 'Array') {
     content = JSON.stringify(value.map(val => val instanceof Parse.Object ? val.toPointer() : val))
-  } else if (type === 'Object') {
+  } else if (type === 'Object' || type === 'Bytes') {
     content = JSON.stringify(value);
   } else if (type === 'File') {
     if (value.url()) {
-      content = <a href={value.url()} target='_blank'><Pill value={getFileName(value)} /></a>;
+      content = <Pill value={getFileName(value)} />;
     } else {
       content = <Pill value={'Uploading\u2026'} />;
     }
   } else if (type === 'ACL') {
     let pieces = [];
     let json = value.toJSON();
-    if (json.hasOwnProperty('*')) {
+    if (Object.prototype.hasOwnProperty.call(json, '*')) {
       if (json['*'].read && json['*'].write) {
         pieces.push('Public Read + Write');
       } else if (json['*'].read) {
@@ -72,6 +85,8 @@ let BrowserCell = ({ type, value, hidden, width, current, onSelect, readonly, on
     content = pieces.join(', ');
   } else if (type === 'GeoPoint') {
     content = `(${value.latitude}, ${value.longitude})`;
+  } else if (type === 'Polygon') {
+    content = value.coordinates.map(coord => `(${coord})`)
   } else if (type === 'Relation') {
     content = (
       <div style={{ textAlign: 'center', cursor: 'pointer' }}>

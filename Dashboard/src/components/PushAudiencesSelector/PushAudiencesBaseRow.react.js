@@ -5,11 +5,10 @@
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
  */
-import ParseApp          from 'lib/ParseApp';
-import PropTypes         from 'lib/PropTypes';
-import React             from 'react';
-import styles            from 'components/PushAudiencesSelector/PushAudiencesOption.scss';
-import { NEW_SEGMENT_ID} from 'dashboard/Push/PushConstants';
+import PropTypes          from 'lib/PropTypes';
+import ParseApp           from 'lib/ParseApp';
+import React              from 'react';
+import { NEW_SEGMENT_ID } from 'dashboard/Push/PushConstants';
 
 export default class PushAudiencesBaseRow extends React.Component {
   constructor() {
@@ -41,7 +40,7 @@ export default class PushAudiencesBaseRow extends React.Component {
     this.xhrHandle = xhr;
     promise.then(({ approximate, count }) => {
       this.setState({ approximate, count });
-    });
+    }, () => {});
   }
 
   componentWillMount() {
@@ -65,5 +64,5 @@ export default class PushAudiencesBaseRow extends React.Component {
 }
 
 PushAudiencesBaseRow.contextTypes = {
-  currentApp: React.PropTypes.instanceOf(ParseApp)
+  currentApp: PropTypes.instanceOf(ParseApp)
 };

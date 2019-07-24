@@ -6,18 +6,17 @@
  * the root directory of this source tree.
  */
 import BrowserCell            from 'components/BrowserCell/BrowserCell.react';
-import * as ColumnPreferences from 'lib/ColumnPreferences';
 import * as browserUtils      from 'lib/browserUtils';
 import DataBrowserHeaderBar   from 'components/DataBrowserHeaderBar/DataBrowserHeaderBar.react';
-import DateTimeEditor         from 'components/DateTimeEditor/DateTimeEditor.react';
 import Editor                 from 'dashboard/Data/Browser/Editor.react';
 import EmptyState             from 'components/EmptyState/EmptyState.react';
 import Icon                   from 'components/Icon/Icon.react';
 import Parse                  from 'parse';
 import React                  from 'react';
-import StringEditor           from 'components/StringEditor/StringEditor.react';
 import styles                 from 'dashboard/Data/Browser/Browser.scss';
 import Button                 from 'components/Button/Button.react';
+import ParseApp               from 'lib/ParseApp';
+import PropTypes              from 'lib/PropTypes';
 
 const MAX_ROWS = 60; // Number of rows to render at any time
 const ROW_HEIGHT = 31;
@@ -27,7 +26,7 @@ const READ_ONLY = [ 'objectId', 'createdAt', 'updatedAt' ];
 let scrolling = false;
 
 export default class BrowserTable extends React.Component {
-  constructor(props) {
+  constructor() {
     super();
 
     this.state = {
@@ -36,7 +35,7 @@ export default class BrowserTable extends React.Component {
     this.handleScroll = this.handleScroll.bind(this);
   }
 
-  componentWillReceiveProps(props, context) {
+  componentWillReceiveProps(props) {
     if (props.className !== this.props.className) {
       this.setState({
         offset: 0,
@@ -76,6 +75,7 @@ export default class BrowserTable extends React.Component {
       }
       if (this.state.offset !== offset) {
         this.setState({ offset });
+        this.refs.table.scrollTop = rowsAbove * ROW_HEIGHT;
       }
       if (this.props.maxFetched - offset < 100) {
         this.props.fetchNextPage();
@@ -96,14 +96,17 @@ export default class BrowserTable extends React.Component {
         </span>
         {this.props.order.map(({ name, width }, j) => {
           let type = this.props.columns[name].type;
-          let attr = attributes[name];
-          if (name === 'objectId') {
-            attr = obj.id;
-          } else if (name === 'ACL' && this.props.className === '_User' && !attr) {
-            attr = new Parse.ACL({ '*': { read: true }, [obj.id]: { read: true, write: true }});
-          } else if (type === 'Relation' && !attr && obj.id) {
-            attr = new Parse.Relation(obj, name);
-            attr.targetClassName = this.props.columns[name].targetClass;
+          let attr = obj;
+          if (!this.props.isUnique) {
+              attr = attributes[name];
+            if (name === 'objectId') {
+              attr = obj.id;
+            } else if (name === 'ACL' && this.props.className === '_User' && !attr) {
+              attr = new Parse.ACL({ '*': { read: true }, [obj.id]: { read: true, write: true }});
+            } else if (type === 'Relation' && !attr && obj.id) {
+              attr = new Parse.Relation(obj, name);
+              attr.targetClassName = this.props.columns[name].targetClass;
+            }
           }
           let current = this.props.current && this.props.current.row === row && this.props.current.col === j;
           let hidden = false;
@@ -118,7 +121,7 @@ export default class BrowserTable extends React.Component {
             <BrowserCell
               key={name}
               type={type}
-              readonly={READ_ONLY.indexOf(name) > -1}
+              readonly={this.props.isUnique || READ_ONLY.indexOf(name) > -1}
               width={width}
               current={current}
               onSelect={() => this.props.setCurrent({ row: row, col: j })}
@@ -143,7 +146,7 @@ export default class BrowserTable extends React.Component {
       }
     }
 
-    let headers = this.props.order.map(({ name, width }, i) => (
+    let headers = this.props.order.map(({ name, width }) => (
       {
         width: width,
         name: name,
@@ -187,23 +190,36 @@ export default class BrowserTable extends React.Component {
         if (visible) {
           let { name, width } = this.props.order[this.props.current.col];
           let { type, targetClass } = this.props.columns[name];
-          let readonly = READ_ONLY.indexOf(name) > -1;
+          let readonly = this.props.isUnique || READ_ONLY.indexOf(name) > -1;
           if (name === 'sessionToken') {
             if (this.props.className === '_User' || this.props.className === '_Session') {
               readonly = true;
             }
           }
           let obj = this.props.current.row < 0 ? this.props.newObject : this.props.data[this.props.current.row];
-          let value = obj.get(name);
+          let value = obj;
+          if (!this.props.isUnique) {
+            value = obj.get(name);
+          }
           if (name === 'objectId') {
-            value = obj.id;
+            if (!this.props.isUnique) {
+              value = obj.id;
+            }
           } else if (name === 'ACL' && this.props.className === '_User' && !value) {
             value = new Parse.ACL({ '*': { read: true }, [obj.id]: { read: true, write: true }});
           } else if (name === 'password' && this.props.className === '_User') {
             value = '';
           } else if (type === 'Array') {
             if (value) {
-              value = value.map(val => val instanceof Parse.Object ? val.toPointer() : val);
+              value = value.map(val => {
+                  if (val instanceof Parse.Object) {
+                      return val.toPointer();
+                  } else if (val && typeof val.getMonth === 'function') {
+                      return { __type: "Date", iso: val.toISOString() };
+                  }
+
+                  return val;
+              });
             }
           }
           let wrapTop = Math.max(0, this.props.current.row * ROW_HEIGHT);
@@ -214,27 +230,28 @@ export default class BrowserTable extends React.Component {
           for (let i = 0; i < this.props.current.col; i++) {
             wrapLeft += this.props.order[i].width;
           }
-
-          editor = (
-            <Editor
-              top={wrapTop}
-              left={wrapLeft}
-              type={type}
-              targetClass={targetClass}
-              value={value}
-              readonly={readonly}
-              width={width}
-              onCommit={(newValue) => {
-                if (newValue !== value) {
-                  this.props.updateRow(
-                    this.props.current.row,
-                    name,
-                    newValue
-                  );
-                }
-                this.props.setEditing(false);
-              }} />
-          );
+          if (!this.props.isUnique) {
+            editor = (
+              <Editor
+                top={wrapTop}
+                left={wrapLeft}
+                type={type}
+                targetClass={targetClass}
+                value={value}
+                readonly={readonly}
+                width={width}
+                onCommit={(newValue) => {
+                  if (newValue !== value) {
+                    this.props.updateRow(
+                      this.props.current.row,
+                      name,
+                      newValue
+                    );
+                  }
+                  this.props.setEditing(false);
+                }} />
+            );
+          }
         }
       }
 
@@ -256,10 +273,10 @@ export default class BrowserTable extends React.Component {
               />
             </div>
           );
-        } else {
+        } else if (!this.props.isUnique) {
           addRow = (
             <div className={styles.addRow}>
-              <a onClick={this.props.onAddRow}>
+              <a title='Add Row' onClick={this.props.onAddRow}>
                 <Icon
                   name='plus-outline'
                   width={14}
@@ -316,11 +333,17 @@ export default class BrowserTable extends React.Component {
           selectAll={this.props.selectRow.bind(null, '*')}
           headers={headers}
           updateOrdering={this.props.updateOrdering}
-          readonly={!!this.props.relation}
+          readonly={!!this.props.relation || !!this.props.isUnique}
           handleDragDrop={this.props.handleHeaderDragDrop}
           onResize={this.props.handleResize}
-          onAddColumn={this.props.onAddColumn} />
+          onAddColumn={this.props.onAddColumn}
+          preventSchemaEdits={this.context.currentApp.preventSchemaEdits} />
       </div>
     );
   }
 }
+
+BrowserTable.contextTypes = {
+  currentApp: PropTypes.instanceOf(ParseApp)
+};
+

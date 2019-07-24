@@ -6,11 +6,11 @@
  * the root directory of this source tree.
  */
 import Icon     from 'components/Icon/Icon.react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import React    from 'react';
 import styles   from 'components/Sidebar/Sidebar.scss';
 
-let SidebarSection = ({ active, children, name, link, icon, style }) => {
+let SidebarSection = ({ active, children, name, link, icon, style, primaryBackgroundColor, secondaryBackgroundColor  }) => {
   let classes = [styles.section];
   if (active) {
     classes.push(styles.active);
@@ -22,10 +22,10 @@ let SidebarSection = ({ active, children, name, link, icon, style }) => {
   return (
     <div className={classes.join(' ')}>
       {active ?
-        <div style={style} className={styles.section_header}>{iconContent}<span>{name}</span></div> :
+        <div style={style} className={styles.section_header} style={{ background: primaryBackgroundColor }}>{iconContent}<span>{name}</span></div> :
         <Link style={style} className={styles.section_header} to={{ pathname: link || '' }}>{iconContent}<span>{name}</span></Link>}
 
-      {children ? <div className={styles.section_contents}>{children}</div> : null}
+      {children ? <div className={styles.section_contents} style={{ background: secondaryBackgroundColor }}>{children}</div> : null}
     </div>
   );
 };

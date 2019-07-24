@@ -5,19 +5,18 @@
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
  */
+import PropTypes               from 'lib/PropTypes'; 
 import * as PushAudiencesStore from 'lib/stores/PushAudiencesStore';
 import * as PushConstants      from './PushConstants';
 import Button                  from 'components/Button/Button.react';
 import LoaderContainer         from 'components/LoaderContainer/LoaderContainer.react';
 import ParseApp                from 'lib/ParseApp';
-import PropTypes               from 'lib/PropTypes';
 import PushAudienceDialog      from 'components/PushAudienceDialog/PushAudienceDialog.react';
 import PushAudiencesSelector   from 'components/PushAudiencesSelector/PushAudiencesSelector.react';
 import queryFromFilters        from 'lib/queryFromFilters';
 import React                   from 'react';
 import styles                  from './PushAudiencesData.scss';
-import { center }              from 'stylesheets/base.scss';
-import { List, Map }           from 'immutable';
+import { List }           from 'immutable';
 
 const XHR_KEY = 'PushAudiencesData';
 
@@ -59,7 +58,7 @@ export default class PushAudiencesData extends React.Component {
       this.setState({
         availableDevices: available_devices
       });
-    }, (error) => {
+    }, () => {
       this.setState({
         availableDevices: PushConstants.DEFAULT_DEVICES
       });
@@ -128,7 +127,9 @@ export default class PushAudiencesData extends React.Component {
     // Horrible code here is due to old rails code that sent pushes through it's own endpoint, while Parse Server sends through Parse.Push.
     // Ideally, we would pass a Parse.Query around everywhere.
     parseQuery.containedIn('deviceType', platforms);
-    this.props.onChange(saveForFuture ? (() => {throw "Audiences not supported"})() : PushConstants.NEW_SEGMENT_ID, parseQuery, 1 /* TODO: get the read device count */);
+    if (!saveForFuture) {
+      this.props.onChange(PushConstants.NEW_SEGMENT_ID, parseQuery, 1 /* TODO: get the read device count */);
+    }    
 
     if (saveForFuture){
       this.props.pushAudiencesStore.dispatch(PushAudiencesStore.ActionTypes.CREATE, {
@@ -165,7 +166,7 @@ export default class PushAudiencesData extends React.Component {
   }
 
   render() {
-    let { pushAudiencesStore, loaded, current, ...otherProps } = this.props;
+    let { pushAudiencesStore, current, ...otherProps } = this.props;
 
     let pushAudienceData = pushAudiencesStore.data;
     let audiences = null;
@@ -261,5 +262,5 @@ export default class PushAudiencesData extends React.Component {
 }
 
 PushAudiencesData.contextTypes = {
-  currentApp: React.PropTypes.instanceOf(ParseApp)
+  currentApp: PropTypes.instanceOf(ParseApp)
 };

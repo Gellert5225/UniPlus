@@ -5,6 +5,7 @@
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
  */
+import PropTypes         from 'lib/PropTypes'; 
 import Icon              from 'components/Icon/Icon.react';
 import Parse             from 'parse'
 import ParseApp          from 'lib/ParseApp';
@@ -15,7 +16,7 @@ import styles            from 'dashboard/Data/Browser/Browser.scss';
 function validateEntry(pointers, text, parseServerSupportsPointerPermissions) {
   if (parseServerSupportsPointerPermissions) {
     if (pointers.indexOf(text) > -1) {
-      return Parse.Promise.as({ pointer: text });
+      return Promise.resolve({ pointer: text });
     }
   }
 
@@ -24,18 +25,15 @@ function validateEntry(pointers, text, parseServerSupportsPointerPermissions) {
     new Parse.Query(Parse.User).equalTo('objectId', text)
   );
   let roleQuery = new Parse.Query(Parse.Role).equalTo('name', text);
-  let promise = new Parse.Promise();
-  Parse.Promise.when(userQuery.find({ useMasterKey: true }), roleQuery.find({ useMasterKey: true })).then((user, role) => {
+  return Promise.all([userQuery.find({ useMasterKey: true }), roleQuery.find({ useMasterKey: true })]).then(([user, role]) => {
     if (user.length > 0) {
-      promise.resolve({ user: user[0] });
+      return { user: user[0] };
     } else if (role.length > 0) {
-      promise.resolve({ role: role[0] });
+      return { role: role[0] };
     } else {
-      promise.reject();
+      return Promise.reject();
     }
   });
-
-  return promise;
 }
 
 export default class SecurityDialog extends React.Component {
@@ -55,7 +53,7 @@ export default class SecurityDialog extends React.Component {
           enablePointerPermissions={parseServerSupportsPointerPermissions}
           advanced={true}
           confirmText='Save CLP'
-          details={<a target="_blank" href='http://parseplatform.github.io/docs/ios/guide/#security'>Learn more about CLPs and app security</a>}
+          details={<a target="_blank" href='http://docs.parseplatform.org/ios/guide/#security'>Learn more about CLPs and app security</a>}
           permissions={this.props.perms}
           validateEntry={entry => validateEntry(this.props.userPointers, entry, parseServerSupportsPointerPermissions)}
           onCancel={() => {
@@ -87,5 +85,5 @@ export default class SecurityDialog extends React.Component {
 }
 
 SecurityDialog.contextTypes = {
-  currentApp: React.PropTypes.instanceOf(ParseApp)
+  currentApp: PropTypes.instanceOf(ParseApp)
 };

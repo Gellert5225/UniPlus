@@ -12,10 +12,11 @@ import React               from 'react';
 import styles              from 'components/DataBrowserHeaderBar/DataBrowserHeaderBar.scss';
 import { DragDropContext } from 'react-dnd';
 
+export default
 @DragDropContext(HTML5Backend)
-export default class DataBrowserHeaderBar extends React.Component {
+class DataBrowserHeaderBar extends React.Component {
   render() {
-    let { headers, onResize, selected, selectAll, onAddColumn, updateOrdering, readonly, handleDragDrop } = this.props;
+    let { headers, onResize, selectAll, onAddColumn, updateOrdering, readonly, preventSchemaEdits } = this.props;
     let elements = [
       // Note: bulk checkbox is disabled as all rows are selected (not just visible ones due to current lazy loading implementation)
       // TODO: add bulk checking only visible rows
@@ -60,8 +61,9 @@ export default class DataBrowserHeaderBar extends React.Component {
     if (headers.length % 2) {
       finalStyle.background = 'rgba(224,224,234,0.10)';
     }
+
     elements.push(
-      readonly ? null : (
+      readonly || preventSchemaEdits ? null : (
         <div key='add' className={styles.addColumn} style={finalStyle}>
           <a
             href='javascript:;'

@@ -5,8 +5,9 @@
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
  */
-import ParseApp from 'lib/ParseApp';
-import React    from 'react';
+import PropTypes  from 'lib/PropTypes'; 
+import ParseApp   from 'lib/ParseApp';
+import React      from 'react';
 
 export default class SettingsData extends React.Component {
   constructor() {
@@ -34,7 +35,7 @@ export default class SettingsData extends React.Component {
 
   saveChanges(changes) {
     let promise = this.context.currentApp.saveSettingsFields(changes)
-    promise.then(({successes, failures}) => {
+    promise.then(({successes}) => {
       let newFields = {...this.state.fields, ...successes};
       this.setState({fields: newFields});
     });
@@ -55,5 +56,5 @@ export default class SettingsData extends React.Component {
 }
 
 SettingsData.contextTypes = {
-  currentApp: React.PropTypes.instanceOf(ParseApp)
+  currentApp: PropTypes.instanceOf(ParseApp)
 };

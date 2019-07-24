@@ -5,7 +5,6 @@
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
  */
-import { get, post }     from 'lib/AJAX';
 import keyMirror         from 'lib/keyMirror';
 import Parse             from 'parse';
 import { Map }           from 'immutable';
@@ -22,8 +21,13 @@ function ConfigStore(state, action) {
   action.app.setParseKeys();
   switch (action.type) {
     case ActionTypes.FETCH:
-      return Parse.Config.get().then(({ attributes }) => {
-        return Map({ lastFetch: new Date(), params: Map(attributes) });
+      return Parse._request(
+        'GET',
+        'config',
+        {},
+        { useMasterKey: true }
+      ).then((result) => {
+        return Map({ lastFetch: new Date(), params: Map(result.params) });
       });
     case ActionTypes.SET:
       return Parse._request(

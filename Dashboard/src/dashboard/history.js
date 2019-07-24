@@ -6,6 +6,7 @@
  * the root directory of this source tree.
  */
 
-import { browserHistory } from 'react-router';
+import { createBrowserHistory } from 'history';
 
-export default browserHistory;
+const path = window.PARSE_DASHBOARD_PATH || '/';
+export default createBrowserHistory({ basename: path });

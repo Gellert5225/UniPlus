@@ -14,7 +14,6 @@ import FormButton              from 'components/FormButton/FormButton.react';
 import FormTable               from 'components/FormTable/FormTable.react';
 import getSiteDomain           from 'lib/getSiteDomain';
 import Label                   from 'components/Label/Label.react';
-import Parse                   from 'parse';
 import pluck                   from 'lib/pluck';
 import React                   from 'react';
 import renderFlowFooterChanges from 'lib/renderFlowFooterChanges';
@@ -24,7 +23,6 @@ import TextInput               from 'components/TextInput/TextInput.react';
 import Toggle                  from 'components/Toggle/Toggle.react';
 import Toolbar                 from 'components/Toolbar/Toolbar.react';
 import unique                  from 'lib/unique';
-import { Promise }             from 'parse';
 
 const DEFAULT_LABEL_WIDTH = 60;
 
@@ -39,7 +37,7 @@ export default class PushSettings extends DashboardView {
     window.open(`${getSiteDomain()}/apps/` + this.context.currentApp.slug + '/edit#push', '_blank');
   }
 
-  renderForm({changes, fields, setField, resetFields}) {
+  renderForm({fields, setField}) {
     let pushSettingsFields = <Fieldset
       legend='Push Notification Settings'
       description='Secure push notifications for your app.'>
@@ -158,7 +156,7 @@ export default class PushSettings extends DashboardView {
     return <FlowView
       initialFields={initialFields}
       footerContents={({ changes }) => renderFlowFooterChanges(changes, initialFields, pushFieldOptions)}
-      onSubmit={({ changes, resetFields }) => {
+      onSubmit={({ changes }) => {
         let promiseList = [];
         if (changes.enableClientPush !== undefined) {
           promiseList.push(this.context.currentApp.setEnableClientPush(changes.enableClientPush));
@@ -175,14 +173,11 @@ export default class PushSettings extends DashboardView {
             promiseList.push(this.context.currentApp.deleteGCMPushCredentials(sender_id));
           });
         }
-        let promise = new Promise();
-        Parse.Promise.when(promiseList).then(() => {
-          promise.resolve();
+        return Promise.all(promiseList).then(() => {
           this.forceUpdate(); //Need to forceUpdate to see changes applied to source ParseApp
-        }).fail(errors => {
-          promise.reject({ error: unique(pluck(errors, 'error')).join(' ') });
+        }).catch(errors => {
+          return Promise.reject({ error: unique(pluck(errors, 'error')).join(' ') });
         });
-        return promise;
       }}
       afterSave={({ setField }) => {
         setField('customGCMSenderID', '', true);

@@ -16,13 +16,13 @@ export default class ChromeDropdown extends React.Component {
   constructor() {
     super();
 
-    this.state = { 
+    this.state = {
       open: false,
       selected: false,
     };
   }
 
-  componentWillReceiveProps(nextProps, nextContext) {
+  componentWillReceiveProps(nextProps) {
     this.keyValueMap = {};
     nextProps.options.forEach((value) => {
       if (value instanceof Object) {
@@ -44,7 +44,7 @@ export default class ChromeDropdown extends React.Component {
 
   select(value, e) {
     e.stopPropagation();
-    this.setState({ 
+    this.setState({
       open: false,
       selected: true,
     }, () => {
@@ -53,7 +53,7 @@ export default class ChromeDropdown extends React.Component {
   }
 
   render() {
-    let widthStyle = { width: this.props.width || 140 };
+    let widthStyle = { width: parseFloat(this.props.width || 140) };
     let styles = this.styles;
     let color = this.props.color || 'purple';
 
@@ -73,7 +73,7 @@ export default class ChromeDropdown extends React.Component {
 
     if (this.state.open) {
       let position = Position.inWindow(this.node);
-      let measuredWidth = this.node.offsetWidth;
+      let measuredWidth = parseFloat(this.node.offsetWidth);
       widthStyle = { width: measuredWidth };
       content = (
         <Popover fixed={true} position={position} onExternalClick={() => this.setState({ open: false })}>

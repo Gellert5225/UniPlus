@@ -5,10 +5,10 @@
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
  */
-import Button   from 'components/Button/Button.react';
-import ParseApp from 'lib/ParseApp';
-import Parse    from 'parse';
-import React    from 'react';
+import Button     from 'components/Button/Button.react';
+import ParseApp   from 'lib/ParseApp';
+import React      from 'react';
+import PropTypes  from 'lib/PropTypes'; 
 
 export default class RunNowButton extends React.Component {
   constructor() {
@@ -38,7 +38,7 @@ export default class RunNowButton extends React.Component {
   }
 
   render() {
-    let { job, ...other } = this.props;
+    let { ...other } = this.props;
     let value = 'Run now';
     if (this.state.result === 'error') {
       value = 'Failed.';
@@ -57,5 +57,5 @@ export default class RunNowButton extends React.Component {
 }
 
 RunNowButton.contextTypes = {
-  currentApp: React.PropTypes.instanceOf(ParseApp),
+  currentApp: PropTypes.instanceOf(ParseApp),
 };
